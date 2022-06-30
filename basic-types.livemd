@@ -1,0 +1,384 @@
+# Basic Types
+
+```elixir
+import IEx.Helpers
+```
+
+## Integers
+
+```elixir
+42
+```
+
+```elixir
+is_number(42)
+```
+
+```elixir
+1 + 1
+```
+
+```elixir
+0b1010100
+```
+
+```elixir
+0x2A + 7
+```
+
+```elixir
+1 + 2 * 3
+```
+
+```elixir
+# ouch: "/"c
+3 ** 3 + 4 / 7 - 6
+```
+
+```elixir
+rem(17, 7)
+```
+
+```elixir
+div(17, 7)
+```
+
+#### Integer Size
+
+<!-- livebook:{"break_markdown":true} -->
+
+I'd like to know if in Elixir the integers are unbounded, like Python integers, or have a fixed size (probably 32 bits or 64 bits). Since the largest signed $n$-bit integer is $2^{n-1}$, the largest 64-bit signed integer is
+
+```elixir
+2 ** (64 - 1)
+```
+
+Since experimentally we can generate much larger integers
+
+```elixir
+2 ** 1000
+```
+
+we can infer that Elixir's integers are (effectively) unbounded and that we will never have to worry about integer overflows. 👍
+
+## Floating-Point Numbers
+
+I bet that Elixir is using the standard double [IEEE 754 format](https://en.wikipedia.org/wiki/IEEE_754) to represent floating-point numbers, a.k.a. "floats", exactly like Python (and many, many, many other programming languages).
+
+This format doesn't use a decimal representation of numbers but a binary one. This has the surprising side-effect of introducing round-of errors in the representation of simple (decimal) numbers such as `0.1` or `0.2`. So my test to confirm my assumption is to try the (in)famous sum `0.1 + 0.2` which should be "obviously incorrect":
+
+```elixir
+0.1 + 0.2
+```
+
+Elixir is a bit more strict than Python when it comes to the literal representation of floats.
+Python will gladly accept the syntax `1.` instead of `1.0`, or `.1` instead of `0.1`. On the contrary, Elixir's floats shall [contain a dot and at least one digit before and after the dot](https://hexdocs.pm/elixir/1.12.3/syntax-reference.html#numbers).
+
+```elixir
+# 👍
+0.1
+```
+
+```elixir
+.1 # 👎
+```
+
+```elixir
+1. # 👎
+```
+
+### 🚧 TODO
+
+* exponents,
+
+* 0-, inf, nan ?
+
+* Math stuff, sin, cos, etc?
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Floats & Integers
+
+```elixir
+1 / 2
+```
+
+```elixir
+# TODO: trunc, ceil, floor (inc for negative numbers)
+```
+
+```elixir
+
+```
+
+```elixir
+is_float(4.2)
+```
+
+```elixir
+round(42.7)
+```
+
+```elixir
+trunc(89.7)
+```
+
+```elixir
+trunc(-89.7)
+```
+
+```elixir
+ceil(41.9)
+```
+
+```elixir
+floor(-89.8)
+```
+
+```elixir
+# ceil
+```
+
+```elixir
+# +
+```
+
+## Booleans
+
+```elixir
+false
+```
+
+```elixir
+true
+```
+
+```elixir
+true and false
+```
+
+```elixir
+(true and false) or true
+```
+
+```elixir
+true != false
+```
+
+```elixir
+not true
+```
+
+```elixir
+is_boolean(true)
+```
+
+## Atoms
+
+```elixir
+:orange
+```
+
+```elixir
+true
+```
+
+```elixir
+nil
+```
+
+```elixir
+:apple == :orange
+```
+
+```elixir
+:😀
+```
+
+```elixir
+is_atom(:yala)
+```
+
+## Strings
+
+```elixir
+"Hello world! 👋"
+```
+
+```elixir
+IO.puts("Hello world! 👋")
+```
+
+```elixir
+"break
+lines"
+```
+
+```elixir
+"\t\t---\n---\t\t"
+```
+
+```elixir
+"\xe7"
+```
+
+```elixir
+is_binary("Hello")
+```
+
+```elixir
+"jdskdsjk" <> "kdlsdksl"
+```
+
+```elixir
+h = "Hello world! 👋"
+```
+
+```elixir
+h
+```
+
+```elixir
+byte_size(h)
+```
+
+```elixir
+String.length(h)
+```
+
+```elixir
+"the message is: #{h}"
+```
+
+```elixir
+String.upcase("Sébastien")
+```
+
+## (Anonymous) Functions
+
+```elixir
+greet = fn name -> IO.puts("Hello #{name}") end
+```
+
+```elixir
+greet.("Sébastien")
+```
+
+```elixir
+is_function(greet)
+```
+
+```elixir
+is_function(greet, 0)
+```
+
+```elixir
+is_function(greet, 1)
+```
+
+```elixir
+is_function(greet, 2)
+```
+
+```elixir
+x = 1
+
+(fn ->
+   _x = 1
+   1
+ end).()
+```
+
+## (Linked) Lists
+
+```elixir
+[1, 2, 3]
+```
+
+```elixir
+[1, 2, 3] + [4, 5, 6]
+```
+
+```elixir
+[1, 2, 3] ++ [4, 5, 6]
+```
+
+```elixir
+length([0, 1, 2])
+```
+
+```elixir
+is_list([1, 2, 3])
+```
+
+```elixir
+list = [1, 2, 3]
+hd(list)
+```
+
+```elixir
+tl(list)
+```
+
+```elixir
+hd([])
+```
+
+```elixir
+[11, 12]
+```
+
+```elixir
+'👋'
+```
+
+```elixir
+i('👋')
+```
+
+```elixir
+h(List)
+```
+
+```elixir
+i("Help")
+```
+
+```elixir
+i("\xe7")
+```
+
+```elixir
+l = [0, 1, 2]
+```
+
+```elixir
+l = [-1, 2, 7]
+```
+
+```elixir
+
+```
+
+## Tuples
+
+```elixir
+t = {:ok, nil, 42}
+```
+
+```elixir
+tuple_size(t)
+```
+
+```elixir
+elem(t, 0)
+```
+
+```elixir
+t2 = put_elem(t, 0, :nope)
+t2
+```
+
+```elixir
+t
+```
