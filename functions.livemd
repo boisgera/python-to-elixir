@@ -1,0 +1,127 @@
+# Functions
+
+## Anonymous Functions
+
+```elixir
+p = fn x -> IO.puts(x) end
+```
+
+```elixir
+is_function(p)
+```
+
+```elixir
+# arity
+is_function(p, 0)
+```
+
+```elixir
+# arity
+is_function(p, 1)
+```
+
+```elixir
+# arity
+is_function(p, 2)
+```
+
+```elixir
+p.("Hello world!")
+```
+
+```elixir
+(fn x -> x + 1 end).(7)
+```
+
+```elixir
+(fn x ->
+   y = x + 2
+   z = y - 1
+   z
+ end).(7)
+```
+
+```elixir
+# would be reformated to multiple lines
+(fn x ->
+   y = x + 2
+   z = y - 1
+   z
+ end).(7)
+```
+
+```elixir
+(fn x ->
+   IO.puts(x)
+   :ok
+ end).("Dude!")
+```
+
+```elixir
+adder = fn x -> fn y -> x + y end end
+add7 = adder.(7)
+add7.(8)
+```
+
+## Named Functions
+
+```elixir
+# 🙁
+def p(message) do
+  IO.puts(message)
+end
+```
+
+```elixir
+defmodule Utils do
+  def p(message) do
+    IO.puts(message)
+  end
+
+  def g() do
+    IO.puts("---")
+  end
+end
+```
+
+```elixir
+p("Hello!")
+```
+
+```elixir
+Utils.p("Hello!")
+```
+
+```elixir
+import Utils
+```
+
+```elixir
+p("Hello!")
+```
+
+```elixir
+# wow. Function of arity 0 called !!! 
+# Not what was intended (by me), 
+# but consistent wrt the optional nature of parentheses in function call
+f = Utils.g()
+
+# Mmm does it mean that there are not "public constants" in Module 
+# or do we have the same syntax that can mean two different things here?
+```
+
+```elixir
+# f is now an unnamed function
+f = &Utils.f/1
+```
+
+Question: I am a bit fuzzy about what the need to specify arity means here. Probably:
+
+1. Functions with different arity within a module are considered as not related (the common name is considered "an accident" by the VM)
+2. What does it mean for functions with default arguments. Are they expanded to functions with different arities and then does it mean that we can't capture them as anonymous functions?
+
+```elixir
+f.("Hello world!")
+```
+
+**🚧 TODO:** end of the concepts in <https://elixir-lang.org/getting-started/modules-and-functions.html>
