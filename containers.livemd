@@ -1,0 +1,190 @@
+# Containers
+
+## Intro
+
+Lists and tuples & "dicts" (maps) exist but are pretty different from the data structures of Python. They are (truly) immutable, which requires pretty different implementations, and therefore some operations that we are accustomed to in Python are costly and therefore hard to do (because they mostly should be avoided).
+
+## Lists
+
+Misc.:
+
+* Linked list implementation info (low-level) explains pretty well what operation are cheap (constant time) and costly (linear ... or more).
+
+* Elixir tries to make cheap operations easy to do (core features, syntax, etc.) and the others harder.
+
+* Cheap: prepend an item, get head, get tail (and hence incremental destructuring), that's it!
+
+* Linear: concatenate two lists (with the size of the first list), random access, get length, etc.
+
+```elixir
+[1, 2, 3]
+```
+
+```elixir
+[1, "Hello!", [42, 3.15], {7, 99}, nil, true]
+```
+
+```elixir
+[]
+```
+
+```elixir
+l = [2, 3]
+[1 | l]
+```
+
+```elixir
+[0, 1] ++ [2, 3]
+```
+
+```elixir
+length([0, 1, 2])
+```
+
+```elixir
+l = [0.1, 0.2, 0.3]
+
+# ⚠️ not idiomatic
+Enum.at(l, 1)
+```
+
+```elixir
+[head | tail] = [0, 1, 2]
+```
+
+```elixir
+head
+```
+
+```elixir
+tail
+```
+
+## Tuples
+
+Easy:
+
+* Random access (read and "write")
+
+* (Full) destructuring
+
+That's all!
+
+Hard :
+
+* Extend or restrict a tuple, by design. Effectively fixed-size
+
+```elixir
+{1, 2, 3}
+```
+
+```elixir
+{}
+```
+
+```elixir
+t = {1, 3.14, true, :ok, [1, 4]}
+```
+
+```elixir
+tuple_size(t)
+```
+
+```elixir
+
+```
+
+```elixir
+elem(t, 1)
+```
+
+```elixir
+{count, pi, alive, status, _} = t
+```
+
+```elixir
+pi
+```
+
+```elixir
+put_elem(t, 0, count + 1)
+```
+
+```elixir
+t
+```
+
+```elixir
+s = put_elem(t, 0, count + 1)
+s
+```
+
+## Maps
+
+Start with "simple maps"/"structs" (fixed set of atom keys & syntaxic sugar for literals & field access)
+
+```elixir
+# ⚠️ space needed after colon
+map = %{a: 1, b: 2, c: 4}
+```
+
+```elixir
+map.a
+```
+
+```elixir
+map.d
+```
+
+```elixir
+%{map | a: 42}
+```
+
+```elixir
+%{map | d: 66}
+```
+
+```elixir
+# Ahah, here we actually have used atom keys
+map[:a]
+```
+
+```elixir
+# desugared
+%{:a => 1, :b => 2, :c => 4}
+```
+
+```elixir
+map = %{:a => 1, :b => 2, :c => 4, 4 => :c}
+# repr also desugared now
+map
+```
+
+```elixir
+%{map | 4 => nil}
+```
+
+```elixir
+Map.get(map, :b)
+```
+
+```elixir
+Map.get(map, :z)
+```
+
+```elixir
+Map.put(map, :a, 76)
+```
+
+```elixir
+Map.put(map, "target", "world")
+```
+
+```elixir
+# (partial) pattern matching works
+%{a: a, b: bbb} = map
+```
+
+```elixir
+%{a: a, z: zzz} = map
+```
