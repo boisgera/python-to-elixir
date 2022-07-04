@@ -42,7 +42,8 @@ p.("Hello world!")
 ```
 
 ```elixir
-# would be reformated to multiple lines
+# Would be reformated to multiple lines. Lol it did it automatically?
+# What I meant to demonstrate was that ";" could be used instead of "\n"
 (fn x ->
    y = x + 2
    z = y - 1
@@ -61,6 +62,33 @@ p.("Hello world!")
 adder = fn x -> fn y -> x + y end end
 add7 = adder.(7)
 add7.(8)
+```
+
+And now an even more compact / agressive syntactic version of anonymous functions.
+(Limitations: no constant function, single-expression only (no blocks)).
+
+```elixir
+# needed since f = IO.puts would CALL the function
+f = &IO.puts(&1)
+```
+
+```elixir
+f.("Hello!")
+```
+
+```elixir
+add = &(&1 + &2)
+```
+
+```elixir
+add.(2, 3)
+```
+
+```elixir
+# Issue here for closure to disambiguate the argument
+adder = &(&(&1 + &2))
+# -> nested captures are not allowed which makes sense. So this notation may
+# be handy but it is also a bit cryptic and is less general than `(fn -> ... end)`.
 ```
 
 ## Named Functions
@@ -125,3 +153,69 @@ f.("Hello world!")
 ```
 
 **🚧 TODO:** end of the concepts in <https://elixir-lang.org/getting-started/modules-and-functions.html>
+
+## Arity, Guards & Default Values
+
+```elixir
+# Fuuuuuck. Default values only work for named functions.
+f = fn x, y \\ 0 -> x + y end
+```
+
+```elixir
+defmodule Utils do
+  def add(x \\ 0, y \\ 0, z \\ 0) do
+    x + y + z
+  end
+end
+```
+
+```elixir
+Utils.add()
+```
+
+```elixir
+Utils.add(1)
+```
+
+```elixir
+Utils.add(1, 2)
+```
+
+```elixir
+Utils.add(1, 2, 3)
+```
+
+```elixir
+add = &Utils.add/0
+```
+
+```elixir
+add.()
+```
+
+OK, the stuff with default values is effectively compiled to several distinct Erlang functions.
+
+```elixir
+defmodule Utils do
+  def fact(n \\ 0)
+
+  def fact(n) when n == 0 do
+    1
+  end
+
+  # else
+  def fact(n) do
+    n * fact(n - 1)
+  end
+end
+
+import Utils
+```
+
+```elixir
+fact()
+```
+
+```elixir
+fact(10)
+```
