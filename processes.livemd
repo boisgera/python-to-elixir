@@ -7,15 +7,38 @@ p = spawn(fn -> IO.puts("✨") end)
 ```
 
 ```elixir
-p =
-  spawn(fn ->
-    IO.puts("✨")
-    42
-  end)
+Process.alive?(p)
+```
+
+```elixir
+p = spawn(fn -> 42 end)
 ```
 
 ```elixir
 Process.alive?(p)
+```
+
+```elixir
+p =
+  spawn(fn ->
+    receive do
+      sender -> send(sender, 42)
+    end
+  end)
+```
+
+```elixir
+IO.puts(Process.alive?(p))
+me = self()
+send(p, me)
+Process.sleep(1000)
+IO.puts(Process.alive?(p))
+```
+
+```elixir
+receive do
+  value -> value
+end
 ```
 
 ```elixir
@@ -35,6 +58,8 @@ defmodule Main do
     receive do
       message -> IO.puts(message)
     end
+
+    print_loop()
   end
 end
 ```
@@ -49,4 +74,8 @@ pp = spawn(&print_loop/0)
 
 ```elixir
 send(pp, "Hello!")
+```
+
+```elixir
+send(pp, "Holla!")
 ```
