@@ -1,0 +1,91 @@
+# Enumeration
+
+## Section
+
+General gist: transform for loops into recursion ; need to be explicit on the state, but with default values that's probably rather nice. Below: assuming that we have recursion, here is how we can do a for loop (kind off, one style among many possible ; C-style and Python-style would be useful (conceptually) to implement).
+
+```elixir
+defmodule Utils do
+  def loop(ante, next, post) do
+    state = ante.()
+    {status, state} = next.(state)
+
+    case status do
+      :stop ->
+        post.(state)
+
+      :continue ->
+        loop(fn -> state end, next, post)
+    end
+  end
+end
+
+import Utils
+```
+
+```elixir
+# A reduction scheme
+
+list = [0, 1, 2, 3, 4]
+
+ante = fn ->
+  {list, 0}
+end
+
+next = fn {list, acc} ->
+  case list do
+    [] ->
+      {:stop, {list, acc}}
+
+    [head | tail] ->
+      {:continue, {tail, acc + head}}
+  end
+end
+
+post = fn {_, acc} -> acc end
+
+loop(ante, next, post)
+```
+
+```elixir
+# A filter
+list = [0, 1, 2, 3, 4]
+ante = fn -> {list, []} end
+
+next = fn {list1, list2} ->
+  if list1 == [] do
+    {:stop, {list1, list2}}
+  else
+    [elt | list1] = list1
+
+    if rem(elt, 2) == 0 do
+      {:continue, {list1, list2 ++ [elt]}}
+    else
+      {:continue, {list1, list2}}
+    end
+  end
+end
+
+post = fn {_l1, l2} -> l2 end
+
+loop(ante, next, post)
+```
+
+```elixir
+# A map
+list = [0, 1, 2, 3, 4]
+ante = fn -> {list, []} end
+
+next = fn {list1, list2} ->
+  if list1 == [] do
+    {:stop, {list1, list2}}
+  else
+    [elt | list1] = list1
+    {:continue, {list1, list2 ++ [elt * 7]}}
+  end
+end
+
+post = fn {_l1, l2} -> l2 end
+
+loop(ante, next, post)
+```
