@@ -1,0 +1,52 @@
+# Processes
+
+## Section
+
+```elixir
+p = spawn(fn -> IO.puts("✨") end)
+```
+
+```elixir
+p =
+  spawn(fn ->
+    IO.puts("✨")
+    42
+  end)
+```
+
+```elixir
+Process.alive?(p)
+```
+
+```elixir
+# ATM, recursive anonymous functions ain't a thing
+print_loop = fn ->
+  receive do
+    message -> IO.puts(message)
+  end
+
+  print_loop.()
+end
+```
+
+```elixir
+defmodule Main do
+  def print_loop() do
+    receive do
+      message -> IO.puts(message)
+    end
+  end
+end
+```
+
+```elixir
+import Main
+```
+
+```elixir
+pp = spawn(&print_loop/0)
+```
+
+```elixir
+send(pp, "Hello!")
+```
