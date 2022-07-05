@@ -19,7 +19,9 @@ defmodule Utils do
     end
   end
 end
+```
 
+```elixir
 import Utils
 ```
 
@@ -88,4 +90,113 @@ end
 post = fn {_l1, l2} -> l2 end
 
 loop(ante, next, post)
+```
+
+## Python-Style Iteration ??? Is it even possible without boundary-effects and what would that mean?
+
+... since all data is immutable and variable assignment in a function is not reflected outside of the function. We would at the very least need some explicit "state" to have an effect on the outside data AND return that state at the end ... OUCH. The best we could do is to provide a next "function" that returns the initial elt and raises a `StopIteration` when it's over? Mmm the only way I think we can do that without explicit state is with a process, right? So we would have the concept of **iterator (process)**. But then we still have to manage the block effect explicitely (even if a `do` keywork could be used to avoid the appearance of a function call?). And we would need `Protocol`s too right? Mmmm all this is very sketchy so far.
+
+```elixir
+defmodule StopIteration do
+  defexception message: ""
+end
+```
+
+```elixir
+defprotocol Iterator do
+  def next()
+end
+```
+
+## For Loops
+
+TODO: `Enum`, `Stream`: filter, map, etc.
+
+```elixir
+for elt <- [1, 2, 3] do
+  IO.puts(elt)
+end
+```
+
+```elixir
+for elt <- 0..10 do
+  IO.puts(elt)
+end
+```
+
+```elixir
+for elt <- 0..10 do
+  elt * elt
+end
+```
+
+```elixir
+for elt <- 0..10, elt < 5 do
+  elt * elt
+end
+```
+
+```elixir
+# here, pattern matching would be applicable too.
+for elt <- 0..10,
+    s <- [0, 1],
+    2 < elt,
+    # as long as the value if not nil or false (?) assignment is ok?
+    two = 2,
+    elt < 5 do
+  elt * elt * s * two
+end
+```
+
+## Sandbox
+
+```elixir
+f = fn x, options ->
+  IO.puts(x)
+  inspect(options) |> IO.puts()
+end
+```
+
+```elixir
+f.(42, a: 1, b: 2, c: 42)
+```
+
+```elixir
+# ouch, tuples do not implement `String.Chars`
+IO.puts({1, 2})
+```
+
+```elixir
+inspect({1, 2})
+```
+
+```elixir
+f.(1,
+  do:
+    (
+      b = 7
+      a = 2
+      a + b + 1
+    )
+)
+```
+
+```elixir
+defmodule Utils do
+  def f(options \\ []) do
+    options |> inspect |> IO.puts()
+  end
+end
+```
+
+```elixir
+import Utils
+```
+
+```elixir
+f do
+  a = 1
+  b = 2
+  a + b + 1
+end
 ```
