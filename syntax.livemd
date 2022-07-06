@@ -1,0 +1,137 @@
+# Syntax
+
+## Section
+
+The core Elixir syntax is actually very small. It doesn't seem so because there are various optional syntax construct (*syntaxic sugar*) that makes it feel like a richer, more ordinary programming language. We investigate here how the sugar can be eliminated from your diet.
+
+We have two tools to do that:
+
+* in simple cases we can evaluate two expressions and see that they generate the same value. But this require the syntaxic construct to be evaluated, this doesn't work for functions (we can only gather anecdotical evidence), etc.
+
+* we can use the `quote` macro to give use Elixir internal's representation of a syntaxic construct and compare the output.
+
+**Remark.** Elixir is very LISP-ish ; once the syntaxic sugar is reduced, it becomes more obvious that the Elixir language is also [homoiconic](https://en.wikipedia.org/wiki/Homoiconicity). Macros in such languages are so nice!
+
+### Didactic
+
+* Start with examples and use evaluations only. We can't **prove** that "theses are the same thing modulo the desugaring", but we can **assert** that kind of statement and use evaluation to **test** that it certainly appears to be true.
+
+* Like this, we can delay/make optional the quote/homoiconic/macro (more advanced & conceptual) stuff. Which is anyway more enlightening when we do have a larger syntaxic example to play with, which we are constructing in the first phase.
+
+```elixir
+a = 1
+b = 2
+a + b + 3
+```
+
+```elixir
+# newline -> ";"
+a = 1
+b = 2
+a + b + 3
+```
+
+TODO (didactic): the other way; start with simple rules, build on top and reverse only at the end on constructs that requires multiple layers of rules to be applied (to check the proper integration of the rules).
+
+```elixir
+if true do
+  IO.puts("Hello, world!")
+end
+```
+
+```elixir
+# macros + do blocks (or after, else, etc.) 
+# -> "light syntax for keyword lists when in last place"
+if true, do: IO.puts("Hello world!")
+```
+
+```elixir
+f = fn args, options -> {args, options} end
+```
+
+```elixir
+f.({1, 2, 3}, a: 1, b: 2, c: 3)
+```
+
+```elixir
+# explicit keywork argument list
+f.({1, 2, 3}, a: 1, b: 2, c: 3)
+```
+
+```elixir
+[a: 1, b: 2, c: 3]
+```
+
+```elixir
+# Keyword lists are actually lists of atom, value tuples
+[{:a, 1}, {:b, 2}, {:c, 3}]
+```
+
+```elixir
+IO.puts("Hello world!")
+```
+
+```elixir
+# No parentheses when a function/macro is called is a convenience
+IO.puts("Hello world!")
+```
+
+```elixir
+# Combined use of these rules
+if true do
+  IO.puts("Yes!")
+  IO.puts("It works!")
+else
+  IO.puts("Afraid not...")
+end
+```
+
+```elixir
+if(true, [
+  {:do,
+   (
+     IO.puts("Yes")
+     IO.puts("It works!")
+   )},
+  {:else, IO.puts("Afraid not...")}
+])
+```
+
+## Syntaxic Constructs Representation
+
+TODO here:
+
+* principle of internal repr of syntaxic constructs (=> AST) and examples,
+
+* Oh joy, this is some valid Elixir! Code is represented as data in the same language! => Homoiconicity, LISP roots, etc.
+
+* Functions vs Macros: syntaxically, same thing but function args are evaluated first, while macros end up having the AST as arguments. Should we care? Not particularly, but this is nice to understand that many "core constructs" of the languages are actually implemented as Macros. For example "if"!!!
+
+* Code developped to manage, analyze, transform, generate code is called **metaprogramming** and is easy to do in homoiconic languages (**much** easier than in other languages).
+
+* Hint to DLSs?
+
+```elixir
+quote do
+  if true do
+    IO.puts("Yes!")
+    IO.puts("It works!")
+  else
+    IO.puts("Afraid not...")
+  end
+end
+```
+
+```elixir
+# Same thing!
+quote do
+  if(true, [
+    {:do,
+     (
+       IO.puts("Yes")
+       IO.puts("It works!")
+     )},
+    {:else, IO.puts("Afraid not...")}
+  ])
+end
+```
