@@ -79,3 +79,51 @@ send(pp, "Hello!")
 ```elixir
 send(pp, "Holla!")
 ```
+
+## Section
+
+```elixir
+# A first version of PF could avoid the permanent process and allocate one new
+# when it's called and then let it die.
+defmodule PF do
+  defstruct pid: nil
+
+  # function single-arged for now. Dunno how to do NOT hardcode the number of args
+  def new(function) do
+    sender = self()
+    pid = spawn(fn -> loop({sender, function}) end)
+    %PF{pid: pid}
+  end
+
+  def call(pf, arg) do
+    pid = pf.pid
+    send(pid, {:call, self(), arg})
+
+    receive do
+      {:return, ^pid, value} -> value
+      _ -> raise "Unexpected message ..."
+    end
+  end
+
+  # This this is messy! Recursive anonymous functions would solve that, right?
+  # here "state" provide information hiding (somehow).
+  defp loop(state) do
+    {sender, function} = state
+
+    receive do
+      {:call, ^sender, arg} -> send(sender, {:return, self(), function.(arg)})
+      _ -> raise "Sh*t happened"
+    end
+
+    loop(state)
+  end
+end
+```
+
+```elixir
+pf = PF.new(fn x -> x + 42 end)
+```
+
+```elixir
+PF.call(pf, 56)
+```
